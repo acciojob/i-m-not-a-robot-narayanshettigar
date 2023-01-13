@@ -9,7 +9,105 @@
 <body>
 	<!-- the entire body must be written by student -->
     <script type="text/javascript" src="./script.js">
+		 // state variable to keep track of the current state
+    let state = 1;
+
+    // variable to keep track of the first tile clicked
+    let firstTile = null;
+
+    // variable to keep track of the second tile clicked
+    let secondTile = null;
+
+    // array of image sources
+    let images = [
+      'img1.jpg',
+      'img2.jpg',
+      'img3.jpg',
+      'img4.jpg',
+      'img5.jpg',
+      'img1.jpg' // duplicate image
+    ];
+
+    // function to shuffle the images array
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    // shuffle the images array
+    shuffle(images);
+
+    // function to handle image clicks
+    function handleImageClick(event) {
+      let clickedImage = event.target;
+
+      if (state === 1) {
+        // save the first image clicked
+        firstTile = clickedImage;
+        firstTile.classList.add('selected');
+        state = 2;
+        document.getElementById('reset').style.display = 'block';
+      } else if (state === 2) {
+        // save the second image clicked
+        secondTile = clickedImage;
+        secondTile.classList.add('selected');
+
+        // prevent double clicking the same image
+        if (firstTile === secondTile) {
+          secondTile.classList.remove('selected');
+          secondTile = null;
+          return;
+        }
+
+        state = 3;
+        document.getElementById('btn').style.display = 'block';
+      }
+    }
+
+    // function to handle the reset button click
+    function handleResetClick() {
+      firstTile.classList.remove('selected');
+      secondTile.classList.remove('selected');
+      firstTile = null;
+      secondTile = null;
+      state = 1;
+      document.getElementById('reset').style.display = 'none';
+    }
+
+    // function to handle the verify button click
+    function handleVerifyClick() {
+      if (firstTile.dataset.nsTest === secondTile.dataset.nsTest) {
+        document.getElementById('para').innerHTML = 'You are a human. Congratulations!';
+      } else {
+        document.getElementById('para').innerHTML = "We can't verify you as a human.
+        You selected the non-identical tiles.";
+      }
+      document.getElementById('btn').style.display = 'none';
+      document.getElementById('para').style.display = 'block';
+    }
+
+    // create the image elements and add them to the page
+    let imageContainer = document.getElementById('images');
+    images.forEach(function(image, index) {
+      let img = document.createElement('img');
+      img.src = image;
+      img.dataset.nsTest = 'img' + (index + 1);
+      img.addEventListener('click', handleImageClick);
+      imageContainer.appendChild(img);
+    });
+
+    // add event listeners to the buttons
+    document.getElementById('reset').addEventListener('click', handleResetClick);
+    document.getElementById('btn').addEventListener('click', handleVerifyClick);
 </script>
+  <h3 id="prompt">Please click on the identical tiles to verify that you are not a robot</h3>
+  <div id="images">
+  </div>
+  <button id="reset" style="display:none">Reset</button>
+  <button id="btn" style="display:none">Verify</button>
+  <p id="para" style="display:none"></p>
 
 </body>
 
